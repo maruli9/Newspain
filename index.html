@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15344a">
+<title>NewSpain — Hiszpański</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f5f9;color:#183044;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif}
+header{background:linear-gradient(135deg,#15344a,#16758b);color:white;padding:26px 18px}
+header h1{margin:0;font-size:30px}
+header p{opacity:.85;margin:8px 0 0}
+main{max-width:720px;margin:auto;padding:14px 14px 80px}
+nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px}
+button{font:inherit;cursor:pointer}
+nav button,.btn{border:0;border-radius:13px;padding:12px;background:#e9f1f5;color:#194052}
+nav button{white-space:nowrap;background:white}
+nav button.active,.primary{background:#18738b!important;color:white!important}
+.card{background:white;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 3px 18px #193a5010}
+.es{font-size:26px;font-weight:750;line-height:1.4;margin:18px 0}
+.pl{font-size:18px;color:#52687b;line-height:1.5}
+.small{font-size:13px;color:#718392}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+.btn{margin:2px}
+.heart{color:#d14367}
+.option{display:block;width:100%;padding:15px;text-align:left;margin:9px 0;background:#f5f8fa;border:1px solid #dbe5eb;border-radius:12px;white-space:normal}
+.correct{background:#e1f7eb!important;border-color:#34a16b!important}
+.wrong{background:#ffe6eb!important;border-color:#d85270!important}
+input{width:100%;padding:13px;border:1px solid #d6e2ea;border-radius:12px;font:inherit}
+.note{background:#eaf4f6;padding:13px;border-radius:12px;line-height:1.7}
+h2{margin-top:0}
+</style>
+</head>
+<body>
+<header>
+<h1>🇪🇸 NewSpain</h1>
+<p>Hiszpański na każdy dzień</p>
+</header>
+<main>
+<nav>
+<button class="active" onclick="show('sentences',this)">📚 Zdania</button>
+<button onclick="show('favorites',this)">❤️ Ulubione</button>
+<button onclick="show('quiz',this)">🧠 Quiz</button>
+<button onclick="show('listening',this)">🎧 Słuchanie</button>
+<button onclick="show('grammar',this)">📖 Gramatyka</button>
+</nav>
+<div id="app"></div>
+</main>
+<script>
+const raw=`
+Hola, ¿cómo estás?|Cześć, jak się masz?
+Estoy muy bien, gracias.|Mam się bardzo dobrze, dziękuję.
+¿Cómo te llamas?|Jak masz na imię?
+Me llamo Ana.|Mam na imię Ana.
+Mucho gusto.|Miło mi.
+¿De dónde eres?|Skąd jesteś?
+Soy de Polonia.|Jestem z Polski.
+Vivo en Viena.|Mieszkam w Wiedniu.
+Estoy aprendiendo español.|Uczę się hiszpańskiego.
+No entiendo.|Nie rozumiem.
+¿Puedes repetirlo?|Możesz to powtórzyć?
+Habla más despacio, por favor.|Mów wolniej, proszę.
+¿Qué significa esta palabra?|Co znaczy to słowo?
+¿Cómo se dice en español?|Jak to się mówi po hiszpańsku?
+Tengo una pregunta.|Mam pytanie.
+Necesito ayuda.|Potrzebuję pomocy.
+Muchas gracias.|Bardzo dziękuję.
+De nada.|Nie ma za co.
+Perdón, lo siento.|Przepraszam, przykro mi.
+Hasta mañana.|Do jutra.
+Buenos días.|Dzień dobry rano.
+Buenas tardes.|Dzień dobry po południu.
+Buenas noches.|Dobry wieczór lub dobranoc.
+Que tengas un buen día.|Miłego dnia.
+Nos vemos pronto.|Do zobaczenia wkrótce.
+Tengo hambre.|Jestem głodny.
+Tengo sed.|Chce mi się pić.
+Quiero un café.|Chcę kawę.
+Quisiera una mesa para dos.|Poproszę stolik dla dwóch osób.
+¿Tiene el menú?|Czy ma pan lub pani menu?
+¿Qué me recomienda?|Co pan lub pani poleca?
+La cuenta, por favor.|Rachunek, proszę.
+Está delicioso.|To jest pyszne.
+No como carne.|Nie jem mięsa.
+Soy alérgico a los frutos secos.|Mam alergię na orzechy.
+¿Hay opciones vegetarianas?|Czy są opcje wegetariańskie?
+Un vaso de agua, por favor.|Szklankę wody, proszę.
+Sin azúcar, por favor.|Bez cukru, proszę.
+¿Puedo pagar con tarjeta?|Czy mogę zapłacić kartą?
+¿Cuánto cuesta?|Ile to kosztuje?
+Es demasiado caro.|To jest za drogie.
+¿Tiene algo más barato?|Czy ma pan lub pani coś tańszego?
+Solo estoy mirando.|Tylko oglądam.
+Me lo llevo.|Biorę to.
+¿Dónde está el baño?|Gdzie jest toaleta?
+¿Dónde está la estación?|Gdzie jest dworzec?
+¿Cómo llego al centro?|Jak dojdę do centrum?
+Gira a la derecha.|Skręć w prawo.
+Gira a la izquierda.|Skręć w lewo.
+Sigue todo recto.|Idź cały czas prosto.
+Está cerca de aquí.|To jest blisko stąd.
+Está muy lejos.|To jest bardzo daleko.
+Necesito un billete.|Potrzebuję biletu.
+¿A qué hora sale el tren?|O której odjeżdża pociąg?
+He perdido mi teléfono.|Zgubiłem telefon.
+¿Puede llamar a un taxi?|Czy może pan lub pani wezwać taksówkę?
+Tengo una reserva.|Mam rezerwację.
+¿Hay wifi gratis?|Czy jest darmowe Wi-Fi?
+¿A qué hora es el desayuno?|O której jest śniadanie?
+Quiero una habitación tranquila.|Chcę cichy pokój.
+Hoy hace buen tiempo.|Dziś jest ładna pogoda.
+Hace mucho calor.|Jest bardzo gorąco.
+Hace frío.|Jest zimno.
+Está lloviendo.|Pada deszcz.
+Mañana va a hacer sol.|Jutro będzie słonecznie.
+¿Qué hora es?|Która godzina?
+Son las ocho y media.|Jest ósma trzydzieści.
+Hoy es lunes.|Dziś jest poniedziałek.
+Mañana tengo tiempo.|Jutro mam czas.
+Ayer estuve ocupado.|Wczoraj byłem zajęty.
+Trabajo desde casa.|Pracuję z domu.
+Estoy de vacaciones.|Jestem na wakacjach.
+Tengo que trabajar.|Muszę pracować.
+Estoy cansado.|Jestem zmęczony.
+Necesito descansar.|Muszę odpocząć.
+Me gusta leer.|Lubię czytać.
+Me encanta viajar.|Uwielbiam podróżować.
+No me gusta esperar.|Nie lubię czekać.
+Prefiero el té.|Wolę herbatę.
+Quiero aprender más.|Chcę nauczyć się więcej.
+Puedo hablar un poco.|Potrafię trochę mówić.
+No puedo venir hoy.|Nie mogę dziś przyjść.
+¿Quieres venir conmigo?|Chcesz pójść ze mną?
+Vamos a dar un paseo.|Chodźmy na spacer.
+¿Tienes planes para mañana?|Masz plany na jutro?
+Estoy buscando a un amigo.|Szukam przyjaciela.
+Mi familia vive lejos.|Moja rodzina mieszka daleko.
+Tengo dos hermanos.|Mam dwoje rodzeństwa.
+Este es mi amigo.|To jest mój przyjaciel.
+Me alegro de verte.|Cieszę się, że cię widzę.
+Te echo de menos.|Tęsknię za tobą.
+Feliz cumpleaños.|Wszystkiego najlepszego z okazji urodzin.
+Buena suerte.|Powodzenia.
+No te preocupes.|Nie martw się.
+Todo va a salir bien.|Wszystko będzie dobrze.
+Estoy de acuerdo.|Zgadzam się.
+No estoy seguro.|Nie jestem pewien.
+Creo que sí.|Myślę, że tak.
+Creo que no.|Myślę, że nie.
+Es una buena idea.|To dobry pomysł.
+Tienes razón.|Masz rację.
+Depende del día.|To zależy od dnia.
+Necesito pensarlo.|Muszę to przemyśleć.
+¿Puedes ayudarme?|Możesz mi pomóc?
+Tengo dolor de cabeza.|Boli mnie głowa.
+No me siento bien.|Nie czuję się dobrze.
+Necesito un médico.|Potrzebuję lekarza.
+¿Dónde hay una farmacia?|Gdzie jest apteka?
+Llame a una ambulancia.|Proszę wezwać karetkę.
+Estoy listo para empezar.|Jestem gotowy, żeby zacząć.
+`;
+const data=raw.trim().split("\n").map(x=>x.split("|"));
+let fav=[];
+try{fav=JSON.parse(localStorage.getItem("newspainFavorites")||"[]")}catch(e){}
+let page="sentences",index=0,game=null;
+const app=document.getElementById("app");
+
+function speak(text){
+ if(!("speechSynthesis" in window)){
+  alert("Ta przeglądarka nie obsługuje odczytu.");
+  return;
+ }
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(text);
+ u.lang="es-ES";
+ u.rate=.8;
+ const voice=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith("es"));
+ if(voice)u.voice=voice;
+ speechSynthesis.speak(u);
+}
+function show(name,button){
+ page=name;game=null;
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ if(button)button.classList.add("active");
+ render();
+}
+function toggle(i){
+ if(fav.includes(i))fav=fav.filter(x=>x!==i);
+ else fav.push(i);
+ localStorage.setItem("newspainFavorites",JSON.stringify(fav));
+ render();
+}
+function sentence(i){
+ return `<div class="card">
+ <div class="small">Zdanie ${i+1} z ${data.length}</div>
+ <div class="es" lang="es">${data[i][0]}</div>
+ <div class="pl">${data[i][1]}</div>
+ <div class="actions">
+ <button class="btn primary" onclick="speak(data[${i}][0])">🔊 Posłuchaj</button>
+ <button class="btn ${fav.includes(i)?"heart":""}" onclick="toggle(${i})">${fav.includes(i)?"♥ Usuń z ulubionych":"♡ Do ulubionych"}</button>
+ </div></div>`;
+}
+function render(){
+ if(page==="sentences"){
+  app.innerHTML=`<div class="card">
+  <h2>📚 Ucz się zdań</h2>
+  <p class="small">110 praktycznych zdań. Słuchaj, powtarzaj i zapisuj ulubione.</p>
+  <input placeholder="🔎 Szukaj po hiszpańsku lub polsku" oninput="search(this.value)">
+  </div><div id="results">${sentence(index)}
+  <div class="actions">
+  <button class="btn" onclick="move(-1)">← Poprzednie</button>
+  <button class="btn primary" onclick="move(1)">Następne →</button>
+  <button class="btn" onclick="randomSentence()">🎲 Losuj</button>
+  </div></div>`;
+ }else if(page==="favorites"){
+  app.innerHTML=`<div class="card"><h2>❤️ Ulubione (${fav.length})</h2>
+  <p class="small">Zapisane zdania pozostają na tym urządzeniu.</p></div>`+
+  (fav.length?fav.map(sentence).join(""):'<div class="card">Nie masz jeszcze ulubionych zdań.</div>');
+ }else if(page==="grammar"){
+  grammar();
+ }else if(!game){
+  app.innerHTML=`<div class="card"><h2>${page==="quiz"?"🧠 Quiz zdań":"🎧 Rozumienie ze słuchu"}</h2>
+  <p>${page==="quiz"?"Wybierz poprawne polskie tłumaczenie hiszpańskiego zdania.":"Posłuchaj zdania po hiszpańsku i wybierz właściwe tłumaczenie."}</p>
+  <div class="actions"><button class="btn primary" onclick="start(10)">10 pytań</button>
+  <button class="btn primary" onclick="start(20)">20 pytań</button></div></div>`;
+ }else question();
+}
+function move(n){
+ index=(index+n+data.length)%data.length;
+ render();
+}
+function randomSentence(){
+ index=Math.floor(Math.random()*data.length);
+ render();
+}
+function search(q){
+ q=q.trim().toLowerCase();
+ const result=document.getElementById("results");
+ if(!q){render();return}
+ const ids=data.map((d,i)=>d.join(" ").toLowerCase().includes(q)?i:-1)
+ .filter(i=>i>=0).slice(0,20);
+ result.innerHTML=ids.length?ids.map(sentence).join(""):'<div class="card">Brak wyników.</div>';
+}
+function shuffle(a){
+ for(let i=a.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function start(n){
+ game={ids:shuffle(data.map((_,i)=>i)).slice(0,n),at:0,score:0,choice:null,options:null};
+ question();
+}
+function question(){
+ if(game.at===game.ids.length){
+  app.innerHTML=`<div class="card"><h2>🎉 Koniec!</h2>
+  <div class="es">Wynik: ${game.score} / ${game.ids.length}</div>
+  <button class="btn primary" onclick="start(${game.ids.length})">Jeszcze raz</button>
+  <button class="btn" onclick="game=null;render()">Wybierz inny quiz</button></div>`;
+  return;
+ }
+ const id=game.ids[game.at];
+ if(!game.options){
+  game.options=shuffle([id,...shuffle(data.map((_,i)=>i).filter(i=>i!==id)).slice(0,3)]);
+ }
+ const listening=page==="listening";
+ let html=`<div class="card"><div class="small">Pytanie ${game.at+1} / ${game.ids.length} · ${game.score} punktów</div>`;
+ html+=listening?
+ `<p>Posłuchaj i wybierz tłumaczenie:</p><button class="btn primary" onclick="speak(data[${id}][0])">🔊 Odtwórz zdanie</button>`:
+ `<div class="es">${data[id][0]}</div><button class="btn" onclick="speak(data[${id}][0])">🔊 Posłuchaj</button>`;
+ game.options.forEach((v,k)=>{
+  let cls="";
+  if(game.choice!==null){
+   if(v===id)cls="correct";
+   else if(k===game.choice)cls="wrong";
+  }
+  html+=`<button class="option ${cls}" ${game.choice!==null?"disabled":""} onclick="answer(${k})">${"ABCD"[k]}. ${data[v][1]}</button>`;
+ });
+ if(game.choice!==null){
+  html+=`<p><b>${game.options[game.choice]===id?"✅ Dobrze!":"❌ Poprawnie: "+data[id][1]}</b></p>
+  <button class="btn primary" onclick="next()">Dalej →</button>`;
+ }
+ app.innerHTML=html+"</div>";
+}
+function answer(k){
+ if(game.choice!==null)return;
+ game.choice=k;
+ if(game.options[k]===game.ids[game.at])game.score++;
+ question();
+}
+function next(){
+ game.at++;
+ game.choice=null;
+ game.options=null;
+ question();
+}
+const verbs=[
+ ["SER — być","soy, eres, es, somos, sois, son","Soy de Polonia. — Jestem z Polski.","Tożsamość, pochodzenie i cechy."],
+ ["ESTAR — być","estoy, estás, está, estamos, estáis, están","Estoy cansado. — Jestem zmęczony.","Stan, samopoczucie i miejsce."],
+ ["TENER — mieć","tengo, tienes, tiene, tenemos, tenéis, tienen","Tengo hambre. — Jestem głodny.","Posiadanie, wiek i odczucia."],
+ ["IR — iść / jechać","voy, vas, va, vamos, vais, van","Voy a estudiar. — Będę się uczyć.","Ir a + bezokolicznik oznacza zamiar."],
+ ["HABLAR — mówić","hablo, hablas, habla, hablamos, habláis, hablan","Hablo español. — Mówię po hiszpańsku.","Regularny czasownik na -ar."],
+ ["COMER — jeść","como, comes, come, comemos, coméis, comen","Como en casa. — Jem w domu.","Regularny czasownik na -er."],
+ ["VIVIR — mieszkać","vivo, vives, vive, vivimos, vivís, viven","Vivo en Viena. — Mieszkam w Wiedniu.","Regularny czasownik na -ir."],
+ ["QUERER — chcieć","quiero, quieres, quiere, queremos, queréis, quieren","Quiero aprender. — Chcę się uczyć.","Querer + bezokolicznik."],
+ ["PODER — móc","puedo, puedes, puede, podemos, podéis, pueden","¿Puedes ayudarme? — Możesz mi pomóc?","Poder + bezokolicznik."],
+ ["HACER — robić","hago, haces, hace, hacemos, hacéis, hacen","¿Qué haces? — Co robisz?","Nieregularne yo hago."]
+];
+function grammar(){
+ let html=`<div class="card"><h2>📖 Gramatyka</h2>
+ <div class="note"><b>Ser czy estar?</b><p>Soy de Polonia — pochodzenie.</p>
+ <p>Estoy cansado — aktualny stan.</p>
+ <b>Rodzajniki:</b> el, la, un, una.<br>
+ <b>Pytania:</b> ¿Dónde? gdzie · ¿Cómo? jak · ¿Cuándo? kiedy.</div></div>`;
+ verbs.forEach(v=>{
+  html+=`<div class="card"><h2>${v[0]}</h2>
+  <p>${v[3]}</p>
+  <div class="note">${v[1].split(", ").map((x,i)=>["yo ","tú ","él/ella ","nosotros ","vosotros ","ellos "][i]+x).join("<br>")}</div>
+  <p>${v[2]}</p>
+  <button class="btn primary" onclick="speak('${v[2].split(" — ")[0].replaceAll("'","\\'")}')">🔊 Posłuchaj</button></div>`;
+ });
+ app.innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>
