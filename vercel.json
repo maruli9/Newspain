@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/NewSpain_3_0_Gramatyka_Slowka.html"
+    }
+  ]
+}
